@@ -3,6 +3,18 @@ var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
 var paths = ['Scripts/data.js','Scripts/ui.js'];
 var sassPaths = 'Sass/*.scss';
+var scriptsPaths = 'Scripts/*.js';
+
+//默认执行任务,task调用task，先执行sass，再执行js，最后执行main
+gulp.task('default',['sass','js','browser-sync','watch'], function() {
+    console.log('完成');
+    return;
+});
+//实时监测
+gulp.task('watch',function () {
+    gulp.watch(sassPaths,['sass']);
+    gulp.watch(scriptsPaths,['js']);
+});
 
 //js
 gulp.task('js', function() {
@@ -19,24 +31,14 @@ gulp.task("sass",function () {
         .pipe(sass())
         .pipe(gulp.dest('Styles'));
 });
-//task调用task，先执行sass，再执行js，最后执行main
-gulp.task('main',['sass','js'],function () {
-    console.log('完成');
+//browserSync
+var browserSync = require('browser-sync').create();
+gulp.task('browser-sync', function() {
+    browserSync.init({
+        browser: ["chrome", "firefox","Opera","iexplore"],
+        files: ["*.html","Styles/app.css","Scripts/all.min.js"],
+        server: {
+            baseDir: "./"
+        }
+    });
 });
-
-//默认执行任务
-gulp.task('default', function() {
-    gulp.src(paths)
-        .pipe(uglify())
-        .pipe(concat('all.min.js'))
-        .pipe(gulp.dest('Scripts'));
-    return;
-});
-
-//实时监测
-gulp.task('watch',function () {
-    gulp.watch(sassPaths,['sass']);
-});
-
-
-
